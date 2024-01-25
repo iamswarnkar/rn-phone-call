@@ -2,18 +2,19 @@ import React from 'react';
 import {
   SafeAreaView,
   StatusBar,
-  Text,
   ToastAndroid,
   TouchableOpacity,
   useColorScheme,
-  View,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
-
 import {homeScreen} from '../constants/HomeData';
+import {NavigationProp, ParamListBase} from '@react-navigation/native';
+import {Text, View} from '../components/Themed';
 
-function Home() {
+interface Props {
+  navigation: NavigationProp<ParamListBase>;
+}
+function Home({navigation}: Props) {
   const isDarkMode = useColorScheme() === 'dark';
 
   const showToast = (massage: string) => {
@@ -25,7 +26,7 @@ function Home() {
   };
 
   const navigateToStartCalling = () => {
-    RNImmediatePhoneCall.immediatePhoneCall('8673809041');
+    navigation.navigate('PhoneCall');
   };
   return (
     <SafeAreaView style={[backgroundStyle, {flex: 1}]}>
@@ -33,7 +34,7 @@ function Home() {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <View style={{marginTop: 40}}>
+      <View>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <Text numberOfLines={2} style={{textAlign: 'center', fontSize: 28}}>
             Welcome
