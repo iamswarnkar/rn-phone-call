@@ -28,6 +28,9 @@ function Home({navigation}: Props) {
   const navigateToStartCalling = () => {
     navigation.navigate('PhoneCall');
   };
+  const navigateToDummyData = () => {
+    navigation.navigate('DummyData');
+  };
   return (
     <SafeAreaView style={[backgroundStyle, {flex: 1}]}>
       <StatusBar
@@ -58,6 +61,24 @@ function Home({navigation}: Props) {
                 paddingVertical: 8,
               }}>
               Start Calling
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={navigateToDummyData}
+            style={{
+              backgroundColor: 'pink',
+              width: '80%',
+              borderRadius: 20,
+              marginTop: 8,
+            }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                textAlign: 'center',
+                paddingVertical: 8,
+              }}>
+              navigateToDummyData
             </Text>
           </TouchableOpacity>
         </View>

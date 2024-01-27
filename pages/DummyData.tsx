@@ -31,11 +31,33 @@ interface CallLogs {
 
 const keyExtractor = (data: PhoneNumbers) => data?._id;
 const callLogKeyExtractor = (data: CallLogs) => data?.timestamp;
-
-export default function PhoneCall() {
+const data: PhoneNumbers[] = [
+  {
+    _id: '1',
+    phone_number: '191',
+    __v: '222',
+  },
+  {
+    _id: '2',
+    phone_number: '192',
+    __v: '222',
+  },
+  {
+    _id: '3',
+    phone_number: '193',
+    __v: '222',
+  },
+  {
+    _id: '4',
+    phone_number: '198',
+    __v: '222',
+  },
+];
+export default function DummyData() {
   let callDetector: {dispose: () => any};
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneNumbers[]>([]);
   const [callLogs, setCallLogs] = useState<CallLogs[]>();
+  const [phoneNumberIndex, setPhoneNumberIndex] = useState(0);
 
   const makeCall = async (data: string) => {
     RNImmediatePhoneCall.immediatePhoneCall(data.toString());
@@ -44,6 +66,7 @@ export default function PhoneCall() {
   const renderItem = useCallback(
     ({item, index}: {item: PhoneNumbers; index: number}) => {
       const onPress = () => {
+        setPhoneNumberIndex(index);
         makeCall(item?.phone_number);
       };
       return (
@@ -68,7 +91,7 @@ export default function PhoneCall() {
         </View>
       );
     },
-    [phoneNumbers],
+    [],
   );
 
   const ItemSeparatorComponent = () => <View style={{height: 8}} />;
@@ -87,7 +110,7 @@ export default function PhoneCall() {
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         const callLogs = await CallLogs.load(7);
-        const result = phoneNumbers?.map(row =>
+        const result = data?.map(row =>
           callLogs.filter(
             (row2: CallLogs) =>
               row2.phoneNumber.replace('+91', '') ===
@@ -146,23 +169,21 @@ export default function PhoneCall() {
 
   useEffect(() => {
     callLog();
-    startListener(phoneNumbers);
+    startListener();
 
     return () => {
       stopListener();
     };
-  }, [phoneNumbers]);
+  }, []);
 
-  const startListener = useCallback((phoneNumbers: PhoneNumbers[]) => {
+  const startListener = useCallback(() => {
     callDetector = new CallDetectorManager(
       (event: string, phoneNumber: string) => {
         if (event === 'Disconnected') {
-          if (phoneNumbers) {
-            for (let i = 0; i < phoneNumbers.length - 1; i++) {
-              if (phoneNumber === phoneNumbers[i].phone_number) {
-                makeCall(phoneNumbers[i + 1]?.phone_number);
-                break;
-              }
+          for (let i = 0; i < data.length - 1; i++) {
+            if (phoneNumber === data[i].phone_number) {
+              makeCall(data[i + 1]?.phone_number);
+              break;
             }
           }
         } else if (event === 'Incoming') {
@@ -186,36 +207,16 @@ export default function PhoneCall() {
     callDetector && callDetector.dispose();
   };
 
-  useEffect(() => {
-    fetch('http://16.170.162.36:8001/new/data')
-      .then(res => res.json())
-      .then(data => {
-        if (data) {
-          setPhoneNumbers(data?.numbersData);
-        } else {
-          Alert.alert('Network error', 'something want wrong');
-        }
-      });
-  }, []);
-
   return (
     <View style={{height: '100%'}}>
       <View style={{paddingHorizontal: 20}}>
-        {phoneNumbers ? (
-          <FlatList
-            style={{marginTop: 20, width: '100%'}}
-            data={phoneNumbers}
-            keyExtractor={keyExtractor}
-            renderItem={renderItem}
-            ItemSeparatorComponent={ItemSeparatorComponent}
-          />
-        ) : (
-          <ActivityIndicator
-            style={{marginTop: 48}}
-            size="large"
-            color="#00ff00"
-          />
-        )}
+        <FlatList
+          style={{marginTop: 20, width: '100%'}}
+          data={data}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          ItemSeparatorComponent={ItemSeparatorComponent}
+        />
       </View>
       {callLogs && (
         <View
